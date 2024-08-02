@@ -1,4 +1,5 @@
 There are few Bugs present in the Project.
+
 **check.txt file created is for backend purposes (so please do not alter that file)**
 1. In the case you want to set font into italic or bold and revert the text back in normal mode then you need to select the text from left to right **(move cursor from left to right)** then only you will be apply
    to perform the operation. That's how **textCursor.hasSelection()** commands operates here.
