@@ -3,4 +3,5 @@ There are few Bugs present in the Project.
    to perform the operation. That's how **textCursor.hasSelection()** commands operates here.
 2. In case you need to insert an attachment to the front or back section of the card. It will be inserted to both the parts of the card. So you want to keep image in either of part of the card then you need to
    delete it.
-3. Stats button is unoperationle for now.
+
+**If you have any ideas for now to resolve the issues please suggest me.**
