@@ -71,7 +71,7 @@ class SecondUI(QMainWindow):
     def insert_image(self):
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "JPEG Files(*.jpeg);;PNG Files(*.png);;JPG Files(*.jpg)", options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "PNG Files(*.png);;JPEG Files(*.jpeg);;JPG Files(*.jpg)", options=options)
         if file_path:
             self.insert_image_into_text_edit(file_path)
     def insert_image_into_text_edit(self, file_path):
