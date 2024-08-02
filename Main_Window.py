@@ -49,6 +49,28 @@ class UI(QMainWindow):
         # Show the App
         self.show()
 
+        # Message Box
+        if os.path.exists("check.txt")==False:
+            f = open("check.txt","w")
+            f.close()
+        f = open("check.txt","r")
+        s = f.readline()
+        print(s)
+        f.close()
+        if (s!='1'):
+            f = open("check.txt","w")
+            f.write('1')
+            f.close()
+            msg_box = QMessageBox()
+            msg_box.setIcon(QMessageBox.Information)
+            msg_box.setText("""Here are some new features\n
+    1. Duplicate FlashCard detection in folder 
+    while inserting new flashcard.\n
+    Last updated 02 August 2024""")
+            msg_box.setWindowTitle("Updates in my project")
+            msg_box.setStandardButtons(QMessageBox.Ok)
+            retval = msg_box.exec_()
+
     def open_directory(self):
         fname = str(QFileDialog.getExistingDirectory(self,"Select Directory",""))
         if fname!="":
