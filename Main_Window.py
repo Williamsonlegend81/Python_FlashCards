@@ -55,7 +55,7 @@ class UI(QMainWindow):
             f.close()
         f = open("check.txt","r")
         s = f.readline()
-        print(s)
+        # print(s)
         f.close()
         if (s!='1'):
             f = open("check.txt","w")
@@ -64,9 +64,12 @@ class UI(QMainWindow):
             msg_box = QMessageBox()
             msg_box.setIcon(QMessageBox.Information)
             msg_box.setText("""Here are some new features\n
+    Version 1.2.0\n
     1. Duplicate FlashCard detection in folder 
     while inserting new flashcard.\n
-    Last updated 02 August 2024""")
+    2. Reversed Basic Card Insertion is also 
+    possible now in the Add FlashCard Window.\n
+    Last updated 07 August 2024""")
             msg_box.setWindowTitle("Updates in my project")
             msg_box.setStandardButtons(QMessageBox.Ok)
             retval = msg_box.exec_()
@@ -82,10 +85,14 @@ class UI(QMainWindow):
             if (dupli==False):
                 index = self.listwidget.currentRow()
                 self.listwidget.insertItem(index,folder_name)
+                counter = 0
                 self.elements = len(os.listdir(f"{fname}"))
-                self.new.insertItem(index, f"{self.elements}")
+                for el in os.listdir(f"{fname}"):
+                    if el.endswith(".json"):    
+                        counter+=1
+                self.new.insertItem(index, f"{counter}")
                 self.learn.insertItem(index, "0")
-                new_list.append(f"{self.elements}")
+                new_list.append(f"{counter}")
                 learn_list.append("0")
                 due_list.append("0")
                 self.due.insertItem(index, "0")
