@@ -63,10 +63,10 @@ class ThirdUI(QMainWindow):
 
         # Activating the functions
         self.showanswer.clicked.connect(self.show_answer)
-        self.option1.clicked.connect(self.next_card)
-        self.option2.clicked.connect(self.next_card)
-        self.option3.clicked.connect(self.next_card)
-        self.option4.clicked.connect(self.next_card)
+        self.option1.clicked.connect(lambda: self.next_card(list_widget))
+        self.option2.clicked.connect(lambda: self.next_card(list_widget))
+        self.option3.clicked.connect(lambda: self.next_card(list_widget))
+        self.option4.clicked.connect(lambda: self.next_card(list_widget))
         self.closing.clicked.connect(lambda: self.show_main(main_w,counter))
 
         self.cards = []
@@ -80,7 +80,7 @@ class ThirdUI(QMainWindow):
         for lister in list_widget:
             folder_name = lister
             self.load_cards_from_folder(folder_name)
-        self.load_card()
+        self.load_card(list_widget)
     
     def show_main(self,main_w,number):
         t2 = time.time()-self.start_time
@@ -89,7 +89,11 @@ class ThirdUI(QMainWindow):
         lst_learn = main_w.learn
         lst_items = main_w.listwidget
         for i in range(lst_learn.count()):
-            lst_learn.item(i).setText(f"{len(os.listdir(lst_items.item(i).text()))}")
+            counter = 0
+            for el in os.listdir(lst_items.item(i).text()):
+                if el.endswith(".json"):
+                    counter+=1
+            lst_learn.item(i).setText(f"{counter}")
         for i in range(lst_new.count()):
             lst_new.item(i).setText("0")
         main_w.show()
@@ -105,20 +109,56 @@ class ThirdUI(QMainWindow):
                         card_data = json.load(f)
                         self.cards.append(card_data)
 
-    def load_card(self):
+    def load_card(self,list_widget):
         if not self.cards:
             self.message.setText("No cards available")
             return
         
-        card = self.cards[self.current_card_index]
-        self.question1.setText(card['front'])
-        self.question2.setText(card['back'])
-        self.question2.hide()
-        self.showanswer.show()
-        self.option1.hide()
-        self.option2.hide()
-        self.option3.hide()
-        self.option4.hide()
+        json_files = 0
+        for lister in list_widget:
+            for el in os.listdir(f"{lister}"):
+                if el.endswith(".json"):
+                    json_files+=1
+        
+        val = 0
+        if os.path.isfile(f"{lister}\\card_{self.current_card_index+1}.txt"):
+            with open(f"{lister}\\card_{self.current_card_index+1}.txt","r") as f:
+                val = int(f.read())
+
+            if val%2==1:
+                card = self.cards[self.current_card_index]
+                self.question1.setText(card['front'])
+                self.question2.setText(card['back'])
+                self.question2.hide()
+                self.showanswer.show()
+                self.option1.hide()
+                self.option2.hide()
+                self.option3.hide()
+                self.option4.hide()
+                with open(f"{lister}\\card_{self.current_card_index+1}.txt","w") as f:
+                    f.write(f"{val+1}")
+            else:
+                card = self.cards[self.current_card_index]
+                self.question1.setText(card['back'])
+                self.question2.setText(card['front'])
+                self.question2.hide()
+                self.showanswer.show()
+                self.option1.hide()
+                self.option2.hide()
+                self.option3.hide()
+                self.option4.hide()
+                with open(f"{lister}\\card_{self.current_card_index+1}.txt","w") as f:
+                    f.write(f"{val+1}")
+        else:
+            card = self.cards[self.current_card_index]
+            self.question1.setText(card['front'])
+            self.question2.setText(card['back'])
+            self.question2.hide()
+            self.showanswer.show()
+            self.option1.hide()
+            self.option2.hide()
+            self.option3.hide()
+            self.option4.hide()
     
     def show_answer(self):
         self.question2.show()
@@ -128,7 +168,7 @@ class ThirdUI(QMainWindow):
         self.option3.show()
         self.option4.show()
 
-    def next_card(self):
+    def next_card(self,list_widget):
         self.current_card_index +=1
         if self.current_card_index >= len(self.cards):
             self.showanswer.hide()
@@ -142,7 +182,6 @@ class ThirdUI(QMainWindow):
             self.message.hide()
             self.closing.show()
         else:
-            self.load_card()
-
+            self.load_card(list_widget)
             
 
