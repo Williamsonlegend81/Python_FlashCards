@@ -1,9 +1,10 @@
-from PyQt5.QtWidgets import QMainWindow,QComboBox,QPushButton,QTextEdit,QLabel,QColorDialog,QFontDialog,QFileDialog
+from PyQt5.QtWidgets import QMainWindow,QComboBox,QPushButton,QTextEdit,QLabel,QColorDialog,QFontDialog,QFileDialog,QMessageBox
 from PyQt5 import uic
 import json
 import os
 from PyQt5.QtGui import QFont,QColor,QTextListFormat,QTextImageFormat
 from PyQt5.QtCore import Qt
+import filecmp
 
 save = False
 adds = ""
@@ -40,6 +41,7 @@ class SecondUI(QMainWindow):
         self.rearlab = self.findChild(QLabel,"label_4")
 
         self.cardtype.addItem("Basic")
+        self.cardtype.addItem("Reversed Basic Card")
 
         self.bold.clicked.connect(self.toggle_bold)
         self.italic.clicked.connect(self.toggle_italic)
@@ -66,12 +68,16 @@ class SecondUI(QMainWindow):
             except OSError as error:
                 print(error)
             self.cards.addItem(item)
+        for i in range(len(os.listdir(f"{self.cards.currentText()}"))):
+                # print((os.listdir(f"{self.cards.currentText()}"))[i])
+                # print(f"{self.cards.currentText()}\\"f"{os.listdir(f"{self.cards.currentText()}")}"[-1])
+                print(f"{self.cards.currentText()}\\"f"{os.listdir(f"{self.cards.currentText()}")[i]}")
 
         self.show()
     def insert_image(self):
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "PNG Files(*.png);;JPEG Files(*.jpeg);;JPG Files(*.jpg)", options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "JPEG Files(*.jpeg);;PNG Files(*.png);;JPG Files(*.jpg)", options=options)
         if file_path:
             self.insert_image_into_text_edit(file_path)
     def insert_image_into_text_edit(self, file_path):
@@ -260,7 +266,6 @@ class SecondUI(QMainWindow):
         save = True
         global adds
         adds = str(filepath).split('/')[-1]
-        # print(adds)
         if filepath!="":
             self.load_from_json(filepath)
     def add_to_json(self):
@@ -271,9 +276,22 @@ class SecondUI(QMainWindow):
                 "front": self.front.toHtml(),
                 "back": self.back.toHtml()
             }
-            with open(f"{self.cards.currentText()}\\card_{len(os.listdir(f"{self.cards.currentText()}"))+1}.json", "a") as f:
+            counter = 0
+            for el in os.listdir(f"{self.cards.currentText()}"):
+                if el.endswith(".json"):
+                    counter+=1
+            with open(f"{self.cards.currentText()}\\card_{counter+1}.json", "a") as f:
                 json.dump(data, f, indent=4)
                 f.write('\n')
+            if (self.cardtype.currentText()=="Reversed Basic Card"):
+                with open(f"{self.cards.currentText()}\\card_{counter+1}.txt", "w") as f:
+                    f.write('1')
+            for i in range(len(os.listdir(f"{self.cards.currentText()}"))-1):
+                if (filecmp.cmp(f"{self.cards.currentText()}\\"f"{os.listdir(f"{self.cards.currentText()}")[-1]}",f"{self.cards.currentText()}\\"f"{os.listdir(f"{self.cards.currentText()}")[i]}",shallow=True)):
+                    question = QMessageBox.question(self,"Duplicate File Found","Duplicate FlashCard present in the same folder do you want to still enter?", QMessageBox.Yes | QMessageBox.No)
+                    if question == QMessageBox.No:
+                        os.remove(f"{self.cards.currentText()}\\"f"{os.listdir(f"{self.cards.currentText()}")[-1]}")
+                    break
         else:
             os.remove(f"{self.cards.currentText()}\\{adds}")
             data = {
